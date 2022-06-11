@@ -1,0 +1,12 @@
+#vscode configs
+/.vscode
+
+#libraries
+/include
+/lib
+
+#raw download files
+/downloads
+
+#test files
+test.png
