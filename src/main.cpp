@@ -6,8 +6,10 @@ int main() {
     Graphics graphics;
 
     while (!graphics.ShouldClose()) {
-        graphics.RenderLoop();
+        graphics.Render();
     }
+    graphics.Exit();
+    graphics.Delete();
 
     
 

@@ -78,7 +78,10 @@ class Shader {
             glDeleteShader(fragment);
         }
         void Use() { glUseProgram(handler); }
-        void Delete() { glDeleteProgram(handler); }
+        void Delete() { 
+            glUseProgram(handler);
+            glDeleteProgram(handler); 
+        }
         void SetTexture(const char* uniform, GLuint unit) {
             GLuint location = glGetUniformLocation(handler, uniform);
             glUniform1i(location, unit);

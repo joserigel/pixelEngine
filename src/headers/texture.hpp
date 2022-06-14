@@ -9,8 +9,15 @@ class Texture {
         static unsigned int textureCount;
         GLuint handler;   
         GLuint unit;
+        int resX, resY, ratio;
+
     public:
-        Texture() {
+        Texture(int width, int height, int divisor) {
+            //Init texture resolution
+            ratio = divisor;
+            resX = width / ratio;
+            resY = height / ratio;
+
             //Offset for other texture instances
             unit = textureCount;
 
@@ -25,38 +32,55 @@ class Texture {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            textureCount++;
-        }
-        unsigned int GetUnit() { return unit; }
-        void Define(int width, int height) {
-            glActiveTexture(GL_TEXTURE0 + unit);
-            glBindTexture(GL_TEXTURE_2D, handler);
-
-            unsigned char* bytes = new unsigned char[width * height * 4];
-            for (int i=0; i<width*height*4; i+=4) {
+            unsigned char* bytes = new unsigned char[resX * resY * 4];
+            for (int i=0; i<resX*resY*4; i+=4) {
                 bytes[i] = 0;
                 bytes[i + 1] = 0;
                 bytes[i + 2] = 0;
                 bytes[i + 3] = 255;
             }
+
             glTexImage2D(
-                GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                GL_TEXTURE_2D, 0, GL_RGBA, resX, resY,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
 
             delete[] bytes;
+
+            textureCount++;
         }
-        void SetPixel(int x, int y) {
-            glActiveTexture(GL_TEXTURE0 + unit);
-            glBindTexture(GL_TEXTURE_2D, handler);
-            
-            unsigned char bytes[] = {255, 255, 255, 255};
+        unsigned int GetUnit() { return unit; }
+        void SetPixel(int x, int y, 
+            unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+            unsigned char bytes[] = {r, g, b, a};
             glTexSubImage2D(GL_TEXTURE_2D, 0,
             x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
         }
+        void SetArray(int x, int y, int width, int height, unsigned char* bytes) {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA,
+                GL_UNSIGNED_BYTE, bytes); 
+        }
+        void SetColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+            unsigned char* bytes = new unsigned char[resX * resY * 4];
+
+            for (int i=0; i<resX*resY*4; i+=4) {
+                bytes[i] = r;
+                bytes[i + 1] = g;
+                bytes[i + 2] = b;
+                bytes[i + 3] = a;
+            }
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, resX, resY, 0, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
+            
+            delete[] bytes;
+        }
+        void Bind() { glBindTexture(GL_TEXTURE_2D, handler); }
+        void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
+        void Delete() {
+            glDeleteTextures(1, &handler);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
 };
 
-unsigned int Texture::textureCount = 0;
+
 
 #endif

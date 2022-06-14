@@ -4,9 +4,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <algorithm>
 
 #include "shader.hpp"
 #include "texture.hpp"
+
+#define DIVISOR 4
 
 class Graphics
 {
@@ -30,6 +33,7 @@ class Graphics
             }
         }
     public:
+        void Start();
         Graphics() {
             //Init GLFW
             if (!glInitialized) {
@@ -84,31 +88,21 @@ class Graphics
                 glEnableVertexAttribArray(1);
 
                 //Create Texture
-                texture = new Texture();
-                texture->Define(width, height);
+                texture = new Texture(width, height, DIVISOR);
 
                 //Use Shaders
                 shader = new Shader("src/shaders/default.vert", "src/shaders/default.frag");
                 shader->Use();
                 shader->SetTexture("txtr", texture->GetUnit());
+
+                Start();
             }
         }
         bool ShouldClose() {
             return glfwWindowShouldClose(window);
         }
-        void Input() {
-            double x, y;
-            glfwGetCursorPos(window, &x, &y);
-            int cursorX = (int)round(x);
-            int cursorY = (int)round(y);
-
-            if (cursorX < width && cursorX >= 0 && 
-                    cursorY < height && cursorY >= 0) {
-                texture->SetPixel(cursorX, height - cursorY);
-            }
-            
-        }
-        void RenderLoop() {
+        void Draw();
+        void Render() {
             //Misc.
             WindowResizeBehavior();
             
@@ -116,22 +110,29 @@ class Graphics
             glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            Input();
+            //Input and DrawLoop
+            Draw();
 
-            //User Defined
+            //Draw the Rectangle
             glBindVertexArray(vao);
+            texture->Bind();
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             
             //Swap Buffer + Poll
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
+        void Exit();
         void Delete() {
+            shader->Delete();
+            texture->Delete();
             glfwDestroyWindow(window);
             glfwTerminate();
+
+
+            delete shader;
+            delete texture;
         }
 };
-
-bool Graphics::glInitialized = false;
 
 #endif
