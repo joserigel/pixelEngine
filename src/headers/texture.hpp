@@ -56,8 +56,16 @@ class Texture {
             x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
         }
         void SetArray(int x, int y, int width, int height, unsigned char* bytes) {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA,
-                GL_UNSIGNED_BYTE, bytes); 
+            for (int i=0; i<width; i++) {
+                for (int j=0; j<height; j++) {
+                    if (bytes[(i * 4) + (j * width * 4) + 3] == 255) {
+                        unsigned char r = bytes[(i * 4) + (j * width * 4)];
+                        unsigned char g = bytes[(i * 4) + (j * width * 4) + 1];
+                        unsigned char b = bytes[(i * 4) + (j * width * 4) + 2];
+                        SetPixel(x + i, y + j, r, g, b, 255);
+                    } 
+                }
+            }
         }
         void SetColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
             unsigned char* bytes = new unsigned char[resX * resY * 4];
