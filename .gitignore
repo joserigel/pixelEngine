@@ -4,6 +4,8 @@
 #libraries
 /include
 /lib
+/src/glad.c
+/src/stb.cpp
 
 #raw download files
 /downloads

@@ -2,7 +2,8 @@
 #define TEXTURE_CLASS_HPP
 
 #include <glad/glad.h>
-#include <iostream>
+
+#include "shape.hpp"
 
 class Texture {
     private:
@@ -49,23 +50,13 @@ class Texture {
             textureCount++;
         }
         unsigned int GetUnit() { return unit; }
+        int getWidth() { return resX; }
+        int getHeight() { return resY; }
         void SetPixel(int x, int y, 
             unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
             unsigned char bytes[] = {r, g, b, a};
             glTexSubImage2D(GL_TEXTURE_2D, 0,
             x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
-        }
-        void SetArray(int x, int y, int width, int height, unsigned char* bytes) {
-            for (int i=0; i<width; i++) {
-                for (int j=0; j<height; j++) {
-                    if (bytes[(i * 4) + (j * width * 4) + 3] == 255) {
-                        unsigned char r = bytes[(i * 4) + (j * width * 4)];
-                        unsigned char g = bytes[(i * 4) + (j * width * 4) + 1];
-                        unsigned char b = bytes[(i * 4) + (j * width * 4) + 2];
-                        SetPixel(x + i, y + j, r, g, b, 255);
-                    } 
-                }
-            }
         }
         void SetColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
             unsigned char* bytes = new unsigned char[resX * resY * 4];
@@ -80,6 +71,24 @@ class Texture {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, resX, resY, 0, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
             
             delete[] bytes;
+        }
+        void SetArray(int x, int y, int width, int height, unsigned char* bytes) {
+            for (int i=0; i<width; i++) {
+                for (int j=0; j<height; j++) {
+                    //Check if the alpha channel has a value greater than 0
+                    if (bytes[(i * 4) + (j * width * 4) + 3] > 0) {
+                        unsigned char r = bytes[(i * 4) + (j * width * 4)];
+                        unsigned char g = bytes[(i * 4) + (j * width * 4) + 1];
+                        unsigned char b = bytes[(i * 4) + (j * width * 4) + 2];
+                        SetPixel(x + i, y + j, r, g, b, 255);
+                    } 
+                }
+            }
+        }
+        void SetShape(Shape shape) {
+            SetArray(shape.x, shape.y, 
+                shape.getWidth(), shape.getHeight(), 
+                shape.getBytes());
         }
         void Bind() { glBindTexture(GL_TEXTURE_2D, handler); }
         void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }

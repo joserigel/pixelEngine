@@ -6,15 +6,19 @@
 bool Graphics::glInitialized = false;
 unsigned int Texture::textureCount = 0;
 
-unsigned char* bytes;
+Shape shape(40, 40, 0, 0, DrawCircle(20));
+int xOffset;
 void Graphics::Start() {
-    bytes = DrawLine(100, 120, true);
+    xOffset = 0;
 }
 
 void Graphics::Draw() {
-    texture->SetArray(0, 0, 100, 120, bytes);
-}
+    texture->SetColor(50, 50, 50, 255);
+    if (xOffset < texture->getWidth() - shape.getWidth()) xOffset++;
+    shape.x = xOffset;
+    texture->SetShape(shape);
+}   
 
 void Graphics::Exit() {
-    delete[] bytes;
+    shape.Delete();
 }

@@ -5,6 +5,7 @@
 int main() {
     Graphics graphics;
 
+    graphics.Start();
     while (!graphics.ShouldClose()) {
         graphics.Render();
     }

@@ -94,8 +94,6 @@ class Graphics
                 shader = new Shader("src/shaders/default.vert", "src/shaders/default.frag");
                 shader->Use();
                 shader->SetTexture("txtr", texture->GetUnit());
-
-                Start();
             }
         }
         bool ShouldClose() {
