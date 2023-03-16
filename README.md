@@ -1,15 +1,14 @@
 This is a pixel engine made with OpenGL
 
+# Libraries and includes needed to compile the file
 
-libraries and includes needed to compile the file
-
-DLL Files:
+### DLL Files:
 1. glfw3.dll
 
-LIB:
+### LIB:
 1. libglfw3dll.a
 
-INCLUDE:
+### INCLUDE:
 1. glad
 2. GLFW
 3. glm
